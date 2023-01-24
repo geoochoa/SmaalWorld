@@ -1,62 +1,43 @@
 import * as THREE from "three";
-import { RigidBody } from "@react-three/rapier";
+import { BallCollider, Physics, RigidBody } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
-import { useKeyboardControls } from "@react-three/drei";
 import { useRef } from "react";
+import { useLoader } from "@react-three/fiber";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
 
 export default function World() {
+  /*
+  const model = useLoader(GLTFLoader, "./models/cyl.glb", (loader) => {
+    const dracoLoader = new DRACOLoader();
+    dracoLoader.setDecoderPath("./draco/");
+    loader.setDRACOLoader(dracoLoader);
+  });
+  */
+
   /**
    * Controls
    */
+  //<primitive object={model.scene} />
 
   const body = useRef();
-  const [subscribeKeys, getKeys] = useKeyboardControls();
   useFrame((state, delta) => {
-    const { forward, backward, leftward, rightward } = getKeys();
-
     const worldPosition = body.current.translation();
 
-    const impulse = { x: 0, y: 0, z: 0 };
-    const torque = { x: 0, y: 0, z: 0 };
-
-    const impulseStrength = 400 * delta;
-    const torqueStrength = 300 * delta;
-
-    console.log(worldPosition);
-
-    if (forward) {
-      torque.x += torqueStrength;
-    }
-
-    if (worldPosition.x > -2 && rightward) {
-      impulse.x -= impulseStrength;
-    }
-
-    if (backward) {
-      torque.x -= torqueStrength;
-    }
-
-    if (worldPosition.x < 2 && leftward) {
-      impulse.x += impulseStrength;
-    }
-
-    body.current.applyImpulse(impulse);
-    body.current.applyTorqueImpulse(torque);
-
-    /**
-     * Camera
-     */
+    /*
+    * Camera
     const cameraPosition = new THREE.Vector3();
     cameraPosition.copy(worldPosition);
-    cameraPosition.z += 6.25;
-    cameraPosition.y += 0.65;
-
+    cameraPosition.z += 6.25; //6.25
+    cameraPosition.y += 0.65; //0.65
+    
     const cameraTarget = new THREE.Vector3();
     cameraTarget.copy(worldPosition);
-    cameraTarget.y += 1;
-
+    cameraTarget.y += 1.7;
+    
     state.camera.position.copy(cameraPosition);
     state.camera.lookAt(cameraTarget);
+    */
   });
 
   return (
@@ -65,8 +46,8 @@ export default function World() {
         ref={body}
         colliders="hull"
         type="dynamic"
-        enabledTranslations={[true, false, false, true]}
-        enabledRotations={[true, false, false, true]}
+        enabledTranslations={[false, false, false, false]}
+        enabledRotations={[false, false, false, false]}
         linearDamping={3}
         angularDamping={3}
       >
