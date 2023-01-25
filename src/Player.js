@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Attractor, RigidBody, BallCollider } from "@react-three/rapier";
+import { Attractor, RigidBody, interactionGroups } from "@react-three/rapier";
 import { Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
@@ -40,14 +40,17 @@ export default function Player() {
     var impulseFactor = 100;
     var torqueFactor = 100;
 
+    /*
     if (worldPosition.y < -0.2) {
-      setLinDamping(90);
-      setAngDamping(90);
+      const dampFactor = 200 - Math.abs(worldPosition.y) * 40;
+      setGravStreng(30);
+      setLinDamping(dampFactor);
+      setAngDamping(dampFactor);
     } else {
       setGravStreng(30);
       setLinDamping(200);
       setAngDamping(200);
-    }
+    }*/
 
     const impulseStrength = impulseFactor * delta;
     const torqueStrength = torqueFactor * delta;
@@ -57,21 +60,9 @@ export default function Player() {
       torque.x -= torqueStrength;
     }
 
-    if (worldPosition.x < 3 && rightward) {
-      impulse.x += impulseStrength;
-      torque.z -= torqueStrength;
-      setGravPos([worldPosition.x, 0, 0]);
-    }
-
     if (backward) {
       impulse.z += impulseStrength;
       torque.x += torqueStrength;
-    }
-
-    if (worldPosition.x > -3 && leftward) {
-      impulse.x -= impulseStrength;
-      torque.z += torqueStrength;
-      setGravPos([worldPosition.x, 0, 0]);
     }
 
     body.current.applyImpulse(impulse);
@@ -81,21 +72,22 @@ export default function Player() {
   return (
     <>
       <Attractor
-        position={gravPos}
         type="linear"
         strength={gravStreng}
         range={10}
+        collisionGroups={interactionGroups(0, 0)}
       />
 
       <RigidBody
-        gravityScale={0.5} //0.5
+        gravityScale={0.5}
         ref={body}
         colliders="ball"
-        position={[0, 1.5, 1]} //1.5, 6 , -2 , 0.7
-        restitution={0} //0.2
-        friction={50} //1
-        linearDamping={linDamp} // 200
-        angularDamping={angDamp} //
+        position={[0, 1.5, 1]}
+        restitution={1}
+        friction={1}
+        linearDamping={linDamp}
+        angularDamping={angDamp}
+        collisionGroups={interactionGroups(0)}
       >
         <mesh castShadow>
           <icosahedronGeometry args={[0.5, 1]} />
