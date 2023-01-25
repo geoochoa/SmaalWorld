@@ -8,7 +8,7 @@ export default function Experience() {
   return (
     <>
       <OrbitControls makeDefault />
-      <Physics>
+      <Physics gravity={[0, -9.81, 0]}>
         <Debug />
         <Lights />
         <World />

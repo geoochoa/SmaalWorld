@@ -4,8 +4,20 @@ import { Sphere } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
 import { useRef, useState } from "react";
+import { useControls } from "leva";
 
 export default function Player() {
+  /**
+   * Debug Controls
+   */
+  const { gravStrengC, linDamping, angDamping } = useControls({
+    //90
+    //strength: 82, lin/angDamping: 100
+    gravStrengC: { value: 30, min: 0, max: 200, step: 0.1 },
+    linDamping: { value: 200, min: -200, max: 1000, step: 0.1 },
+    angDamping: { value: 200, min: -200, max: 1000, step: 0.1 },
+  });
+
   /**
    * Controls
    */
@@ -13,6 +25,9 @@ export default function Player() {
   const body = useRef();
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const [gravPos, setGravPos] = useState([0, 0, 0]);
+  const [gravStreng, setGravStreng] = useState(30);
+  const [linDamp, setLinDamping] = useState(200);
+  const [angDamp, setAngDamping] = useState(200);
 
   useFrame((state, delta) => {
     const { forward, backward, leftward, rightward } = getKeys();
@@ -25,22 +40,13 @@ export default function Player() {
     var impulseFactor = 100;
     var torqueFactor = 100;
 
-    /* Need to fix movement on lower y axis space
-    depending on world position . y
-    impulse and torque need to be stronger when in lower y space
-    or something needs to be stronger
-    gravity weighing down ball may be affecting impulse/torque
-     Observations:
-      0.60 < y < 2.50  (Normal Speed [100]) 
-     -1.27 < y < 0.60  (Slow)
-     -2.50 < y < -1.27 (Unmoveable)
-    then for moving horizontal, move attractor like i did with cylinder
-    */
-
-    if (worldPosition.y < 0.65) {
-      //console.log(Math.abs(worldPosition.y) * 10);
-      impulseFactor -= Math.abs(worldPosition.y) * 100;
-      torqueFactor -= Math.abs(worldPosition.y) * 100;
+    if (worldPosition.y < -0.2) {
+      setLinDamping(90);
+      setAngDamping(90);
+    } else {
+      setGravStreng(30);
+      setLinDamping(200);
+      setAngDamping(200);
     }
 
     const impulseStrength = impulseFactor * delta;
@@ -54,7 +60,6 @@ export default function Player() {
     if (worldPosition.x < 3 && rightward) {
       impulse.x += impulseStrength;
       torque.z -= torqueStrength;
-
       setGravPos([worldPosition.x, 0, 0]);
     }
 
@@ -66,7 +71,6 @@ export default function Player() {
     if (worldPosition.x > -3 && leftward) {
       impulse.x -= impulseStrength;
       torque.z += torqueStrength;
-
       setGravPos([worldPosition.x, 0, 0]);
     }
 
@@ -76,17 +80,22 @@ export default function Player() {
 
   return (
     <>
-      <Attractor position={gravPos} type="linear" strength={30} range={10} />
+      <Attractor
+        position={gravPos}
+        type="linear"
+        strength={gravStreng}
+        range={10}
+      />
 
       <RigidBody
         gravityScale={0.5} //0.5
         ref={body}
         colliders="ball"
-        position={[0, 1.5, 6]} //1.8
+        position={[0, 1.5, 1]} //1.5, 6 , -2 , 0.7
         restitution={0} //0.2
-        friction={0} //1
-        linearDamping={200} //30
-        angularDamping={200} //.5
+        friction={50} //1
+        linearDamping={linDamp} // 200
+        angularDamping={angDamp} //
       >
         <mesh castShadow>
           <icosahedronGeometry args={[0.5, 1]} />
