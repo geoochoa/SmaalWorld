@@ -1,25 +1,18 @@
 import * as THREE from "three";
-import { Physics, RigidBody, interactionGroups } from "@react-three/rapier";
+import { RigidBody, interactionGroups } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { useKeyboardControls } from "@react-three/drei";
-import { useLoader } from "@react-three/fiber";
-import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader.js";
+import { useGLTF } from "@react-three/drei";
 
 export default function World() {
   /*
-  const model = useLoader(GLTFLoader, "./models/cyl.glb", (loader) => {
-    const dracoLoader = new DRACOLoader();
-    dracoLoader.setDecoderPath("./draco/");
-    loader.setDRACOLoader(dracoLoader);
-  });
-  */
-
+   */
+  const model = useGLTF("./models/cyl.glb");
+  const house = useGLTF("./models/house.glb");
   /**
    * Controls
    */
-  //<primitive object={model.scene} />
 
   const body = useRef();
   const [subscribeKeys, getKeys] = useKeyboardControls();
@@ -33,34 +26,44 @@ export default function World() {
     const impulse = { x: 0, y: 0, z: 0 };
     const torque = { x: 0, y: 0, z: 0 };
 
-    const impulseStrength = 900 * delta;
-    const torqueStrength = 400 * delta;
+    const impulseStrength = 400 * delta;
+    const torqueStrength = 500 * delta;
 
-    if (worldPosition.x > -1.5 && rightward) {
+    if (backward) {
+      impulse.z -= impulseStrength;
+      torque.x -= torqueStrength;
+    }
+
+    if (forward) {
+      impulse.z += impulseStrength;
+      torque.x += torqueStrength;
+    }
+
+    if (worldPosition.x > -2 && rightward) {
       impulse.x -= impulseStrength;
     }
 
-    if (worldPosition.x < 1.5 && leftward) {
+    if (worldPosition.x < 2 && leftward) {
       impulse.x += impulseStrength;
     }
 
     body.current.applyImpulse(impulse);
-    //body.current.applyTorqueImpulse(torque);
+    body.current.applyTorqueImpulse(torque);
 
     /*
     Camera;
+    */
     const cameraPosition = new THREE.Vector3();
     cameraPosition.copy(worldPosition);
-    cameraPosition.z += 16.25; //6.25
+    cameraPosition.z += 6.25; //6.25
     cameraPosition.y += 0.65; //0.65
-    
+
     const cameraTarget = new THREE.Vector3();
     cameraTarget.copy(worldPosition);
     cameraTarget.y += 1.7;
-    
+
     state.camera.position.copy(cameraPosition);
     state.camera.lookAt(cameraTarget);
-    */
   });
 
   return (
@@ -70,20 +73,25 @@ export default function World() {
         colliders="hull"
         type="dynamic"
         enabledTranslations={[true, false, false, true]}
-        enabledRotations={[false, false, false, false]}
+        enabledRotations={[true, false, false, true]}
         linearDamping={3}
         angularDamping={3}
         collisionGroups={interactionGroups(1)}
       >
-        <mesh
-          receiveShadow
-          position={[0, 0, 0]}
-          rotation-z={-Math.PI * 0.5}
+        <primitive
           scale={2}
-        >
-          <cylinderGeometry attach="geometry" args={[1, 1, 4.5, 32, 1, true]} />
-          <meshStandardMaterial color="greenyellow" />
-        </mesh>
+          rotation-y={-Math.PI * 0.5}
+          position={[0, 0, 0]}
+          object={model.scene}
+        />
+
+        <primitive
+          scale={2}
+          rotation-y={-Math.PI * 0.5}
+          //rotation-z={Math.PI / 6}
+          position={[0, -0.65, 0]} //0, -0.65, 0 => [0, -0.5, 1.2]
+          object={house.scene}
+        />
       </RigidBody>
     </>
   );
