@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { RigidBody } from "@react-three/rapier";
 import { useControls } from "leva";
 import { useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useKeyboardControls } from "@react-three/drei";
 
 export default function Player() {
@@ -11,12 +11,24 @@ export default function Player() {
    */
   const { posX, posY, posZ } = useControls({
     posX: { value: 0, min: -10, max: 10, step: 0.1 },
-    posY: { value: 2.2, min: -10, max: 10, step: 0.1 },
+    posY: { value: 2.2, min: -10, max: 10, step: 0.1 }, //0  1 2
     posZ: { value: 0, min: -10, max: 10, step: 0.1 },
+  }); //-3.3, 2, 1.3
+
+  const { camY, camZ } = useControls({
+    camY: { value: 0.65, min: -20, max: 20, step: 0.1 },
+    camZ: { value: 6.25, min: -20, max: 20, step: 0.1 },
+  }); //-3.3, 2, 1.3
+
+  const { tarY, tarZ } = useControls({
+    tarY: { value: 0.7, min: -20, max: 20, step: 0.1 },
+    tarZ: { value: 0, min: -20, max: 20, step: 0.1 },
   }); //-3.3, 2, 1.3
 
   const player = useRef();
   const [subscribeKeys, getKeys] = useKeyboardControls();
+  const [smoothedCameraPos] = useState(() => new THREE.Vector3());
+  const [smoothedCameraTar] = useState(() => new THREE.Vector3());
 
   useFrame((state, delta) => {
     const { forward, backward, leftward, rightward } = getKeys();
@@ -51,21 +63,19 @@ export default function Player() {
       const quadr = worldPosition.z * worldPosition.y;
       // First two cases account for cases where we are at either of the 4 poles ([0,x], [0, -x], [0,y], [0,-y])
       // For movement on a sphere, forward movement from impulse depends where we are
-      // [***$***] Definitely a way to clean this up, making so these 2 cases appear on bottom cases ***$***
+      // [***$***] Definitely a way to clean this up, making so these 2 cases appear on bottom cases
+      // [***$***] Can possible combine Fwd and Bwd logic, same with conditionals
       if (worldPosition.z > -0.7 && worldPosition.z < 0.7) {
-        console.log("force on the z");
         impulse.z += impulseStrength * tmp.y;
       } else if (worldPosition.y > -0.7 && worldPosition.y < 0.7) {
-        console.log("force on the y");
         impulse.y += impulseStrength * -tmp.z;
       } else if (quadr <= 0) {
         //Q1, Q3
-        console.log("q1,q3");
         impulse.z +=
           (-impulseStrength * (worldPosition.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
       } else if (quadr > 0) {
         //Q2, Q4
-        console.log("q2,q4");
+
         impulse.y +=
           (impulseStrength * (worldPosition.y < 0 ? -1 : 1)) / xFactor;
       }
@@ -77,24 +87,57 @@ export default function Player() {
     if (worldPosition.x > -2.869 && leftward) {
       impulse.x -= impulseStrength;
     }
-    /*
 
     if (backward) {
-      if (worldPosition.y >= 0) {
-        //higher
-        impulse.y += tmp.z;
-        impulse.z += impulseStrength + tmp.z;
-      } else {
-        //lower
-        impulse.y += tmp.z;
-        impulse.z -= impulseStrength - tmp.z;
+      const quadr = worldPosition.z * worldPosition.y;
+      // Similar to Fwd, But flipped
+      if (worldPosition.z > -0.7 && worldPosition.z < 0.7) {
+        impulse.z -= impulseStrength * tmp.y; //tmp.y negative
+      } else if (worldPosition.y > -0.7 && worldPosition.y < 0.7) {
+        impulse.y -= impulseStrength * -tmp.z;
+      } else if (quadr <= 0) {
+        //Q1, Q3
+        impulse.y -=
+          (-impulseStrength * (worldPosition.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
+      } else if (quadr > 0) {
+        //Q2, Q4
+        impulse.z +=
+          (impulseStrength * (worldPosition.y < 0 ? -1 : 1)) / xFactor;
       }
     }
 
-   
-    */
-
     player.current.applyImpulse(impulse);
+
+    /**
+     * Camera
+    console.log(
+      "Real   Pos",
+      worldPosition.y.toFixed(2),
+      worldPosition.y.toFixed(2)
+      );
+      console.log(
+        "Behind Pos",
+        worldPosition.y.toFixed(2),
+        worldPosition.y.toFixed(2)
+        );
+        
+        const cameraPosition = new THREE.Vector3();
+        cameraPosition.copy(worldPosition);
+        cameraPosition.z = camZ; //6.25
+        cameraPosition.y += camY; //0.65
+        
+        const cameraTarget = new THREE.Vector3();
+        cameraTarget.copy(worldPosition);
+        cameraTarget.y += tarY; //1.7
+        cameraTarget.z += tarZ;
+        //cameraTarget.z += 10;
+        
+        smoothedCameraPos.lerp(cameraPosition, 0.5);
+        smoothedCameraTar.lerp(cameraTarget, 0.5);
+        
+        state.camera.position.copy(smoothedCameraPos);
+        state.camera.lookAt(smoothedCameraTar);
+        */
   });
 
   /**

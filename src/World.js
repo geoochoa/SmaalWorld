@@ -17,20 +17,6 @@ export default function World() {
 
   useFrame((state, delta) => {
     const worldPosition = body.current.translation();
-
-    /*
-    const cameraPosition = new THREE.Vector3();
-    cameraPosition.copy(worldPosition);
-    cameraPosition.z += 6.25; //6.25
-    cameraPosition.y += 0.65; //0.65
-    
-    const cameraTarget = new THREE.Vector3();
-    cameraTarget.copy(worldPosition);
-    cameraTarget.y += 1.7;
-    
-    state.camera.position.copy(cameraPosition);
-    state.camera.lookAt(cameraTarget);
-    */
   });
 
   return (
