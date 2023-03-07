@@ -1,164 +1,136 @@
 import * as THREE from "three";
-import { RigidBody } from "@react-three/rapier";
+import { RigidBody, interactionGroups } from "@react-three/rapier";
 import { useControls } from "leva";
 import { useFrame } from "@react-three/fiber";
-import { useRef, useState, useEffect } from "react";
-import { useKeyboardControls } from "@react-three/drei";
+import { useRef, useState, useEffect, Children } from "react";
+import { useKeyboardControls, OrbitControls } from "@react-three/drei";
 
 export default function Player() {
-  /**
-   * Debug Controls
-   */
-  const { posX, posY, posZ } = useControls({
-    posX: { value: 0, min: -10, max: 10, step: 0.1 },
-    posY: { value: 2.2, min: -10, max: 10, step: 0.1 }, //0  1 2
-    posZ: { value: 0, min: -10, max: 10, step: 0.1 },
-  }); //-3.3, 2, 1.3
-
-  const { camY, camZ } = useControls({
-    camY: { value: 0.65, min: -20, max: 20, step: 0.1 },
-    camZ: { value: 6.25, min: -20, max: 20, step: 0.1 },
-  }); //-3.3, 2, 1.3
-
-  const { tarY, tarZ } = useControls({
-    tarY: { value: 0.7, min: -20, max: 20, step: 0.1 },
-    tarZ: { value: 0, min: -20, max: 20, step: 0.1 },
-  }); //-3.3, 2, 1.3
-
   const player = useRef();
   const [subscribeKeys, getKeys] = useKeyboardControls();
-  const [smoothedCameraPos] = useState(() => new THREE.Vector3());
-  const [smoothedCameraTar] = useState(() => new THREE.Vector3());
 
   useFrame((state, delta) => {
+    /*
+     * Controls
+     */
     const { forward, backward, leftward, rightward } = getKeys();
-
-    const worldPosition = player.current.translation();
+    const playerPosi = player.current.translation();
 
     const impulse = { x: 0, y: 0, z: 0 };
 
-    // Makes a copy of the players position but negated to apply inward force towards planet
-    const tmp = new THREE.Vector3(
-      -worldPosition.x,
-      -worldPosition.y,
-      -worldPosition.z
-    );
-    tmp.normalize(); // Brings in Range [0, 1]
-    //tmp.multiplyScalar(0.1); // Scale
-
     const impulseStrength = 10 * delta;
+
+    const quadr = playerPosi.z * playerPosi.y;
+    const xBounds = 1.5;
+    const yBounds = 0.7;
+    const zBounds = 0.7;
+
+    // Makes a copy of the players position but negated to apply inward force towards planet
+    const tmp = new THREE.Vector3(-playerPosi.x, -playerPosi.y, -playerPosi.z);
+    tmp.normalize(); // Brings in Range [0, 1]
 
     // Corrects Gravity Vector when X-Movement combined with Y/Z-Movement
     // [***$***] I should find a better way to calculate this factor
     // This essentially makes sure we apply the correct amt impulse to keep
     //    player grounded while moving on the x axis
-    var xFactor = 1 + Math.abs(worldPosition.x * 0.21) + 0.03; //
+    var xFactor = 1 + Math.abs(playerPosi.x * 0.21) + 0.03; //
     if (Math.round(xFactor) == 0) xFactor = 1; // Divide by Zero Prevention
 
-    //ContinousGravity Vectors
+    //Continous Gravity Vectors
     impulse.y += impulseStrength * tmp.y;
     impulse.z += impulseStrength * tmp.z;
 
     if (forward) {
-      const quadr = worldPosition.z * worldPosition.y;
       // First two cases account for cases where we are at either of the 4 poles ([0,x], [0, -x], [0,y], [0,-y])
       // For movement on a sphere, forward movement from impulse depends where we are
-      // [***$***] Definitely a way to clean this up, making so these 2 cases appear on bottom cases
-      // [***$***] Can possible combine Fwd and Bwd logic, same with conditionals
-      if (worldPosition.z > -0.7 && worldPosition.z < 0.7) {
+      if (playerPosi.z > -zBounds && playerPosi.z < zBounds) {
         impulse.z += impulseStrength * tmp.y;
-      } else if (worldPosition.y > -0.7 && worldPosition.y < 0.7) {
+      } else if (playerPosi.y > -yBounds && playerPosi.y < yBounds) {
         impulse.y += impulseStrength * -tmp.z;
       } else if (quadr <= 0) {
         //Q1, Q3
         impulse.z +=
-          (-impulseStrength * (worldPosition.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
+          (-impulseStrength * (playerPosi.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
       } else if (quadr > 0) {
         //Q2, Q4
-
-        impulse.y +=
-          (impulseStrength * (worldPosition.y < 0 ? -1 : 1)) / xFactor;
+        impulse.y += (impulseStrength * (playerPosi.y < 0 ? -1 : 1)) / xFactor;
       }
     }
 
-    if (worldPosition.x < 2.869 && rightward) {
+    if (playerPosi.x < xBounds && rightward) {
       impulse.x += impulseStrength;
     }
-    if (worldPosition.x > -2.869 && leftward) {
+    if (playerPosi.x > -xBounds && leftward) {
       impulse.x -= impulseStrength;
     }
 
     if (backward) {
-      const quadr = worldPosition.z * worldPosition.y;
-      // Similar to Fwd, But flipped
-      if (worldPosition.z > -0.7 && worldPosition.z < 0.7) {
+      if (playerPosi.z > -zBounds && playerPosi.z < zBounds) {
         impulse.z -= impulseStrength * tmp.y; //tmp.y negative
-      } else if (worldPosition.y > -0.7 && worldPosition.y < 0.7) {
+      } else if (playerPosi.y > -yBounds && playerPosi.y < yBounds) {
         impulse.y -= impulseStrength * -tmp.z;
       } else if (quadr <= 0) {
         //Q1, Q3
         impulse.y -=
-          (-impulseStrength * (worldPosition.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
+          (-impulseStrength * (playerPosi.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
       } else if (quadr > 0) {
         //Q2, Q4
-        impulse.z +=
-          (impulseStrength * (worldPosition.y < 0 ? -1 : 1)) / xFactor;
+        impulse.z += (impulseStrength * (playerPosi.y < 0 ? -1 : 1)) / xFactor;
       }
     }
 
-    player.current.applyImpulse(impulse);
+    //player.current.applyImpulse(impulse);
 
     /**
      * Camera
-    console.log(
-      "Real   Pos",
-      worldPosition.y.toFixed(2),
-      worldPosition.y.toFixed(2)
-      );
-      console.log(
-        "Behind Pos",
-        worldPosition.y.toFixed(2),
-        worldPosition.y.toFixed(2)
-        );
-        
-        const cameraPosition = new THREE.Vector3();
-        cameraPosition.copy(worldPosition);
-        cameraPosition.z = camZ; //6.25
-        cameraPosition.y += camY; //0.65
-        
-        const cameraTarget = new THREE.Vector3();
-        cameraTarget.copy(worldPosition);
-        cameraTarget.y += tarY; //1.7
-        cameraTarget.z += tarZ;
-        //cameraTarget.z += 10;
-        
-        smoothedCameraPos.lerp(cameraPosition, 0.5);
-        smoothedCameraTar.lerp(cameraTarget, 0.5);
-        
-        state.camera.position.copy(smoothedCameraPos);
-        state.camera.lookAt(smoothedCameraTar);
-        */
+     */
+
+    const cameraPosi = new THREE.Vector3();
+    cameraPosi.copy(playerPosi);
+
+    cameraPosi.x = 0;
+    cameraPosi.y = 0;
+    cameraPosi.z = 3;
+
+    const cameraTarg = new THREE.Vector3();
+    cameraTarg.copy(playerPosi);
+    cameraTarg.y = 0.8;
+
+    state.camera.position.copy(cameraPosi);
+    state.camera.lookAt(cameraTarg);
   });
 
-  /**
-   * Controls
-   */
+  // Helper functions to help point camera at 'ideal' positions
+  function calculateIdealOffset(playerRotation, playerPosition) {
+    const idealOffset = new THREE.Vector3(0, 0, 5);
+    idealOffset.applyQuaternion(playerRotation);
+    idealOffset.add(playerPosition);
+    return idealOffset;
+  }
+  function calculateIdealTarget(playerRotation, playerPosition) {
+    const idealTarget = new THREE.Vector3(0, 0, 0);
+    idealTarget.applyQuaternion(playerRotation);
+    idealTarget.add(playerPosition);
+    return idealTarget;
+  }
 
   return (
     <>
+      <OrbitControls />
       <RigidBody
+        collisionGroups={interactionGroups(2, 1)}
         mass={1}
         ref={player}
-        type="dynamic"
+        type="fixed"
         colliders="hull"
-        position={[posX, posY, posZ]} //0, 1.5, 2.1 =>
+        position={[0, 0.7, 0.7]} //0, 0.7, 2.2
+        rotation={[Math.PI * -0.3, 0, 0]}
         enabledRotations={[false, false, false, false]}
-        //restitution={0.2} //0.2
-        //friction={1} //1`
         linearDamping={5} //30
+        //angularDamping={5} //
       >
         <mesh castShadow scale={0.4}>
-          <icosahedronGeometry args={[0.5, 1]} />
+          <boxGeometry args={[0.2, 0.2, 0.3]} />
           <meshStandardMaterial color="orange" />
         </mesh>
       </RigidBody>

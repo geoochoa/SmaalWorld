@@ -2,40 +2,77 @@ import * as THREE from "three";
 import { RigidBody, interactionGroups } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, useKeyboardControls, useTexture } from "@react-three/drei";
 
 export default function World() {
   /*
    */
-  const model = useGLTF("./models/cyl.glb");
-  const house = useGLTF("./models/house.glb");
+  const { nodes } = useGLTF("./models/world.glb");
+  const bakedTexture = useTexture("./models/baked.jpg");
+  bakedTexture.flipY = false;
+
   /**
    * Controls
    */
 
   const body = useRef();
+  const [subscribeKeys, getKeys] = useKeyboardControls();
 
   useFrame((state, delta) => {
     const worldPosition = body.current.translation();
+    const { forward, backward, leftward, rightward } = getKeys();
+
+    const impulse = { x: 0, y: 0, z: 0 };
+    const torque = { x: 0, y: 0, z: 0 };
+
+    const impulseStrength = 40 * delta;
+    const torqueStrength = 20 * delta;
+
+    if (backward) {
+      torque.x -= torqueStrength;
+    }
+
+    if (forward) {
+      torque.x += torqueStrength;
+    }
+    if (worldPosition.x > -3 && rightward) {
+      impulse.x -= impulseStrength;
+    }
+
+    if (worldPosition.x < 3 && leftward) {
+      impulse.x += impulseStrength;
+    }
+
+    body.current.applyImpulse(impulse);
+    body.current.applyTorqueImpulse(torque);
   });
 
+  /*
+
+*/
   return (
     <>
       <RigidBody
+        collisionGroups={interactionGroups(0, 1)}
         ref={body}
-        colliders="hull"
         type="dynamic"
-        enabledTranslations={[false, false, false, false]}
-        enabledRotations={[false, false, false, false]}
-        linearDamping={3}
-        angularDamping={3}
+        colliders="hull"
+        angularDamping={2}
+        linearDamping={2}
+        enabledRotations={[true, false, false, false]}
+        enabledTranslations={[true, false, false, false]}
+        rotation={[-Math.PI * 0.5, 0, -Math.PI * 0.5]}
+        position={[0, 0, 0]}
       >
-        <primitive
-          scale={2}
-          rotation-y={-Math.PI * 0.5}
-          position={[0, 0, 0]}
-          object={model.scene}
-        />
+        {/* <CuboidCollider
+          collisionGroups={interactionGroups(1, 2)}
+          scale={0.5}
+          args={[0.4, 1, 0.5]}
+          position={[0, -1, 1.1]}
+        /> */}
+        <mesh geometry={nodes.baked.geometry}>
+          <meshBasicMaterial map={bakedTexture} />
+        </mesh>
       </RigidBody>
     </>
   );
