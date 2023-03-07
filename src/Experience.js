@@ -11,10 +11,10 @@ import { Suspense } from "react";
 export default function Experience() {
   return (
     <>
-      <Perf position="top-left" />
+      {/* <Perf position="top-left" /> */}
       <Suspense>
         <Physics gravity={[0, -0.1, 0]}>
-          <Debug />
+          {/* <Debug /> */}
           <Lights />
           <World />
           <Player />

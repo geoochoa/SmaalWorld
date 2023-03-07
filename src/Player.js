@@ -90,7 +90,7 @@ export default function Player() {
 
     cameraPosi.x = 0;
     cameraPosi.y = 0;
-    cameraPosi.z = 3;
+    cameraPosi.z = 5;
 
     const cameraTarg = new THREE.Vector3();
     cameraTarg.copy(playerPosi);
@@ -116,18 +116,18 @@ export default function Player() {
 
   return (
     <>
-      <OrbitControls />
+      {/* <OrbitControls /> */}
       <RigidBody
         collisionGroups={interactionGroups(2, 1)}
         mass={1}
         ref={player}
         type="fixed"
         colliders="hull"
-        position={[0, 0.7, 0.7]} //0, 0.7, 2.2
+        position={[0, 0.7, 0.8]} //0, 0.7, 2.2
         rotation={[Math.PI * -0.3, 0, 0]}
         enabledRotations={[false, false, false, false]}
         linearDamping={5} //30
-        //angularDamping={5} //
+        angularDamping={5} //
       >
         <mesh castShadow scale={0.4}>
           <boxGeometry args={[0.2, 0.2, 0.3]} />

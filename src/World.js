@@ -3,6 +3,7 @@ import { RigidBody, interactionGroups } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { useGLTF, useKeyboardControls, useTexture } from "@react-three/drei";
+import Colliders from "./Colliders.js";
 
 export default function World() {
   /*
@@ -21,6 +22,7 @@ export default function World() {
   useFrame((state, delta) => {
     const worldPosition = body.current.translation();
     const { forward, backward, leftward, rightward } = getKeys();
+    const xBounds = 1.5;
 
     const impulse = { x: 0, y: 0, z: 0 };
     const torque = { x: 0, y: 0, z: 0 };
@@ -35,11 +37,11 @@ export default function World() {
     if (forward) {
       torque.x += torqueStrength;
     }
-    if (worldPosition.x > -3 && rightward) {
+    if (worldPosition.x > -xBounds && rightward) {
       impulse.x -= impulseStrength;
     }
 
-    if (worldPosition.x < 3 && leftward) {
+    if (worldPosition.x < xBounds && leftward) {
       impulse.x += impulseStrength;
     }
 
@@ -70,6 +72,7 @@ export default function World() {
           args={[0.4, 1, 0.5]}
           position={[0, -1, 1.1]}
         /> */}
+        <Colliders />
         <mesh geometry={nodes.baked.geometry}>
           <meshBasicMaterial map={bakedTexture} />
         </mesh>
