@@ -1,8 +1,18 @@
 import * as THREE from "three";
-import { RigidBody, interactionGroups } from "@react-three/rapier";
+import {
+  RigidBody,
+  interactionGroups,
+  CylinderCollider,
+  CuboidCollider,
+} from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import { useGLTF, useKeyboardControls, useTexture } from "@react-three/drei";
+import {
+  Cylinder,
+  useGLTF,
+  useKeyboardControls,
+  useTexture,
+} from "@react-three/drei";
 import Colliders from "./Colliders.js";
 
 export default function World() {
@@ -27,7 +37,7 @@ export default function World() {
     const impulse = { x: 0, y: 0, z: 0 };
     const torque = { x: 0, y: 0, z: 0 };
 
-    const impulseStrength = 40 * delta;
+    const impulseStrength = 30 * delta;
     const torqueStrength = 20 * delta;
 
     if (backward) {
@@ -58,20 +68,14 @@ export default function World() {
         collisionGroups={interactionGroups(0, 1)}
         ref={body}
         type="dynamic"
-        colliders="hull"
-        angularDamping={2}
-        linearDamping={2}
+        colliders={false}
+        angularDamping={5}
+        linearDamping={5}
         enabledRotations={[true, false, false, false]}
         enabledTranslations={[true, false, false, false]}
         rotation={[-Math.PI * 0.5, 0, -Math.PI * 0.5]}
         position={[0, 0, 0]}
       >
-        {/* <CuboidCollider
-          collisionGroups={interactionGroups(1, 2)}
-          scale={0.5}
-          args={[0.4, 1, 0.5]}
-          position={[0, -1, 1.1]}
-        /> */}
         <Colliders />
         <mesh geometry={nodes.baked.geometry}>
           <meshBasicMaterial map={bakedTexture} />
