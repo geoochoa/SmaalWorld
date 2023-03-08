@@ -21,6 +21,7 @@ export default function World() {
   const { nodes } = useGLTF("./models/world.glb");
   const bakedTexture = useTexture("./models/baked.jpg");
   bakedTexture.flipY = false;
+  // console.log(nodes);
 
   /**
    * Controls

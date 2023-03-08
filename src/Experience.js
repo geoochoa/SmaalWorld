@@ -14,7 +14,7 @@ export default function Experience() {
       {/* <Perf position="top-left" /> */}
       <Suspense>
         <Physics gravity={[0, -0.1, 0]}>
-          <Debug />
+          {/* <Debug /> */}
           <Lights />
           <World />
           <Player />
