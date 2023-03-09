@@ -18,8 +18,8 @@ import Colliders from "./Colliders.js";
 export default function World() {
   /*
    */
-  const { nodes } = useGLTF("./models/world.glb");
-  const bakedTexture = useTexture("./models/baked.jpg");
+  const { nodes } = useGLTF("./models/world2.glb");
+  const bakedTexture = useTexture("./models/baked2.jpg");
   bakedTexture.flipY = false;
   // console.log(nodes);
 
@@ -33,12 +33,12 @@ export default function World() {
   useFrame((state, delta) => {
     const worldPosition = body.current.translation();
     const { forward, backward, leftward, rightward } = getKeys();
-    const xBounds = 1.5;
+    const xBounds = 2;
 
     const impulse = { x: 0, y: 0, z: 0 };
     const torque = { x: 0, y: 0, z: 0 };
 
-    const impulseStrength = 30 * delta;
+    const impulseStrength = 40 * delta;
     const torqueStrength = 20 * delta;
 
     if (backward) {
@@ -74,7 +74,7 @@ export default function World() {
         linearDamping={5}
         enabledRotations={[true, false, false, false]}
         enabledTranslations={[true, false, false, false]}
-        rotation={[-Math.PI * 0.5, 0, -Math.PI * 0.5]}
+        rotation={[0, -Math.PI * 0.5, 0]}
         position={[0, 0, 0]}
       >
         <Colliders />
