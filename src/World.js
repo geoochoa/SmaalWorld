@@ -1,27 +1,17 @@
 import * as THREE from "three";
-import {
-  RigidBody,
-  interactionGroups,
-  CylinderCollider,
-  CuboidCollider,
-} from "@react-three/rapier";
+import { RigidBody, interactionGroups } from "@react-three/rapier";
 import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
-import {
-  Cylinder,
-  useGLTF,
-  useKeyboardControls,
-  useTexture,
-} from "@react-three/drei";
+import { useGLTF, useKeyboardControls, useTexture } from "@react-three/drei";
 import Colliders from "./Colliders.js";
 
 export default function World() {
   /*
+   * Models, Textures
    */
   const { nodes } = useGLTF("./models/world2.glb");
   const bakedTexture = useTexture("./models/baked2.jpg");
   bakedTexture.flipY = false;
-  // console.log(nodes);
 
   /**
    * Controls
@@ -60,9 +50,6 @@ export default function World() {
     body.current.applyTorqueImpulse(torque);
   });
 
-  /*
-
-*/
   return (
     <>
       <RigidBody

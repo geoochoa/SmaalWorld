@@ -52,6 +52,7 @@ export default function Colliders() {
     <>
       {/* World */}
       <CylinderCollider
+        id="world"
         scale={0.5}
         args={[4.5, 2, 10]}
         position={[0, 0, 0]}
@@ -62,7 +63,7 @@ export default function Colliders() {
         id="house"
         args={[0.3, 0.2, 0.9]}
         position={[0, 1.1, 1.03]}
-      />{" "}
+      />
       {/* Lights, Condense Later */}
       <CubeCollider position={[0, 1.06, 0.4]} />
       <CubeCollider position={[0, 1.06, -0.4]} />
