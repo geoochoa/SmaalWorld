@@ -4,8 +4,9 @@ import { useFrame } from "@react-three/fiber";
 import { useRef } from "react";
 import { useGLTF, useKeyboardControls, useTexture } from "@react-three/drei";
 import Colliders from "./Colliders.js";
+import Sensors from "./Sensors.js";
 
-export default function World() {
+export default function World({ setMsg, setDesc }) {
   /*
    * Models, Textures
    */
@@ -28,7 +29,7 @@ export default function World() {
     const impulse = { x: 0, y: 0, z: 0 };
     const torque = { x: 0, y: 0, z: 0 };
 
-    const impulseStrength = 40 * delta;
+    const impulseStrength = 35 * delta;
     const torqueStrength = 20 * delta;
 
     if (backward) {
@@ -62,9 +63,9 @@ export default function World() {
         enabledRotations={[true, false, false, false]}
         enabledTranslations={[true, false, false, false]}
         rotation={[0, -Math.PI * 0.5, 0]}
-        position={[0, 0, 0]}
       >
         <Colliders />
+        <Sensors setMsg={setMsg} setDesc={setDesc} />
         <mesh geometry={nodes.baked.geometry}>
           <meshBasicMaterial map={bakedTexture} />
         </mesh>

@@ -5,17 +5,18 @@ import { useFrame } from "@react-three/fiber";
 import { useRef, useState, useEffect, Children } from "react";
 import { useKeyboardControls, OrbitControls } from "@react-three/drei";
 
-export default function Player() {
+export default function Player({ idle, setIdle }) {
   const player = useRef();
   const [subscribeKeys, getKeys] = useKeyboardControls();
+  const [smoothedCameraPosition] = useState(() => new THREE.Vector3());
+  const [smoothedTargetPosition] = useState(() => new THREE.Vector3());
 
   useFrame((state, delta) => {
     /*
      * Controls
      */
-    const { forward, backward, leftward, rightward } = getKeys();
+    const { forward, backward, leftward, rightward, jump } = getKeys();
     const playerPosi = player.current.translation();
-
     const impulse = { x: 0, y: 0, z: 0 };
 
     const impulseStrength = 10 * delta;
@@ -30,9 +31,6 @@ export default function Player() {
     tmp.normalize(); // Brings in Range [0, 1]
 
     // Corrects Gravity Vector when X-Movement combined with Y/Z-Movement
-    // [***$***] I should find a better way to calculate this factor
-    // This essentially makes sure we apply the correct amt impulse to keep
-    //    player grounded while moving on the x axis
     var xFactor = 1 + Math.abs(playerPosi.x * 0.21) + 0.03; //
     if (Math.round(xFactor) == 0) xFactor = 1; // Divide by Zero Prevention
 
@@ -84,17 +82,26 @@ export default function Player() {
     /**
      * Camera
      */
+    if (forward || backward || leftward || rightward || jump) {
+      setIdle(false);
+    }
 
     const cameraPosi = new THREE.Vector3();
     cameraPosi.copy(playerPosi);
 
     cameraPosi.x = 0;
     cameraPosi.y = 0;
-    cameraPosi.z = 5;
+    cameraPosi.z = 3.5;
 
     const cameraTarg = new THREE.Vector3();
     cameraTarg.copy(playerPosi);
-    cameraTarg.y = 0.8;
+    cameraTarg.y = 0.95;
+
+    if (idle) {
+      cameraPosi.z -= 1.3;
+      cameraPosi.y += 0.5;
+      cameraTarg.y -= 0.15;
+    }
 
     state.camera.position.copy(cameraPosi);
     state.camera.lookAt(cameraTarg);

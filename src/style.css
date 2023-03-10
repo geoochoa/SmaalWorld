@@ -71,6 +71,47 @@ body,
     background: #ffffff99;
 }
 
+/*
+ * Messages
+ */
+
+ .msgScreen {
+  position: fixed;
+  bottom: 10%;
+  left: 2%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 8s;
+  z-index: 1;
+  font-family: 'Chelsea Market', cursive;
+}
+
+.msg--bubble {
+  padding: 40px 64px 40px 64px;
+  border-radius: 20px;
+  /* text-align: center; */
+  transition: opacity 0.4s;
+}
+
+.msg--title {
+  font-size: 2rem;
+  color: rgb(0, 0, 0);
+  margin: 0;
+  margin-bottom: 8px;
+}
+.msg--content {
+  color: rgba(3, 3, 3, 0.717);
+  font-weight: bold;
+  font-size: 1.2rem;
+  transition: background-color 0.4s;
+  font-family: 'Chelsea Market', cursive;
+
+  margin: 0;
+  margin-bottom: 8px;
+}
+
+
 /* 
 * Loading Screen
  */
@@ -94,14 +135,15 @@ body,
 
 
 
-.loadingScreen__board {
+.loadingScreen--board {
   padding: 64px;
   background-color: rgb(26,23,24);
+  /* background-color: rgb(19, 235, 19); */
   text-align: center;
   transition: opacity 0.4s;
 }
 
-.loadingScreen__title {
+.loadingScreen--title {
 
   font-size: 8rem;
   color: rgb(255, 255, 255);
@@ -109,7 +151,7 @@ body,
   margin-bottom: 8px;
 }
 
-.loadingScreen__button {
+.loadingScreen--button {
   padding: 8px 32px;
   background-color: rgba(0, 0, 0, 0.24);
   color: rgb(89 89 92);
@@ -121,19 +163,19 @@ body,
   font-family: 'Chelsea Market', cursive;
 }
 
-.loadingScreen__button:hover {
+.loadingScreen--button:hover {
   /*  rgba(0, 0, 0, 0.42); */
   color: rgb(107,184,52);
   background-color: rgba(0, 0, 0, 0.42);
   cursor: pointer;
 }
 
-.loadingScreen__button:disabled {
+.loadingScreen--button:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
 
-.loadingScreen__progress {
+.loadingScreen--progress {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -141,7 +183,7 @@ body,
   height: 12px;
 }
 
-.loadingScreen__progress__value {
+.loadingScreen--progress--value {
   position: absolute;
   left: 0;
   top: 0;
@@ -155,6 +197,6 @@ body,
   pointer-events: none;
 }
 
-.loadingScreen--started .loadingScreen__board {
+.loadingScreen--started .loadingScreen--board {
   opacity: 0;
 }

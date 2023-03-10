@@ -7,14 +7,13 @@ import { KeyboardControls } from "@react-three/drei";
 import Experience from "./Experience.js";
 import LoadingScreen from "./LoadingScreen.js";
 import Interface from "./Interface.js";
+import Messages from "./Messages.js";
 
 export default function App() {
   const [start, setStart] = useState(false);
-  {
-    /* <Perf position="top-left" /> 
-          <Debug />
-      */
-  }
+  const [msg, setMsg] = useState("");
+  const [desc, setDesc] = useState("");
+
   return (
     <>
       <KeyboardControls
@@ -36,10 +35,14 @@ export default function App() {
           }}
         >
           <Suspense fallback={null}>
-            <Experience />
+            <Experience
+              setMsg={(msg) => setMsg(msg)}
+              setDesc={(desc) => setDesc(desc)}
+            />
           </Suspense>
         </Canvas>
         <Interface />
+        {msg == "" ? false : true && <Messages currMsg={msg} currDesc={desc} />}
         <LoadingScreen started={start} onStarted={() => setStart(true)} />
       </KeyboardControls>
     </>

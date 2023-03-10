@@ -6,20 +6,20 @@ export default function LoadingScreen({ started, onStarted }) {
   return (
     <>
       <div
-        className={`loadingScreen ${started ? "loadingScreen--started" : "h"}`}
+        className={`loadingScreen ${started ? "loadingScreen--started" : ""}`}
       >
-        <div className="loadingScreen__progress">
+        <div className="loadingScreen--progress">
           <div
-            className="loadingScreen__progress__value"
+            className="loadingScreen--progress--value"
             style={{
               width: `${progress}%`,
             }}
           />
         </div>
-        <div className="loadingScreen__board">
-          <h1 className="loadingScreen__title">welcome to smaalworld!</h1>
+        <div className="loadingScreen--board">
+          <h1 className="loadingScreen--title">welcome to smaalworld!</h1>
           <button
-            className="loadingScreen__button"
+            className="loadingScreen--button"
             disabled={progress < 100}
             onClick={onStarted}
           >
