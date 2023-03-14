@@ -1,5 +1,9 @@
 import * as THREE from "three";
-import { RigidBody, interactionGroups } from "@react-three/rapier";
+import {
+  RigidBody,
+  interactionGroups,
+  usePrismaticJoint,
+} from "@react-three/rapier";
 import { useControls } from "leva";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState, useEffect, Children } from "react";
@@ -7,9 +11,16 @@ import { useKeyboardControls, OrbitControls } from "@react-three/drei";
 
 export default function Player({ idle, setIdle }) {
   const player = useRef();
+  // const anchor = useRef();
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const [smoothedCameraPosition] = useState(() => new THREE.Vector3());
   const [smoothedTargetPosition] = useState(() => new THREE.Vector3());
+
+  // usePrismaticJoint(anchor, player, [
+  //   [0, 0, 0], // Position of the joint in bodyA's local space
+  //   [0, 0, 0.3], // Position of the joint in bodyB's local space
+  //   [1, 0, 0], // Axis of the joint, expressed in the local-space of the rigid-bodies it is attached to. Cannot be [0,0,0].
+  // ]);
 
   useFrame((state, delta) => {
     /*
@@ -34,48 +45,56 @@ export default function Player({ idle, setIdle }) {
     var xFactor = 1 + Math.abs(playerPosi.x * 0.21) + 0.03; //
     if (Math.round(xFactor) == 0) xFactor = 1; // Divide by Zero Prevention
 
+    impulse.y += impulseStrength * -playerPosi.y;
+    impulse.z += impulseStrength * -playerPosi.z;
+
     //Continous Gravity Vectors
-    impulse.y += impulseStrength * tmp.y;
-    impulse.z += impulseStrength * tmp.z;
-
-    if (forward) {
-      // First two cases account for cases where we are at either of the 4 poles ([0,x], [0, -x], [0,y], [0,-y])
-      // For movement on a sphere, forward movement from impulse depends where we are
-      if (playerPosi.z > -zBounds && playerPosi.z < zBounds) {
-        impulse.z += impulseStrength * tmp.y;
-      } else if (playerPosi.y > -yBounds && playerPosi.y < yBounds) {
-        impulse.y += impulseStrength * -tmp.z;
-      } else if (quadr <= 0) {
-        //Q1, Q3
-        impulse.z +=
-          (-impulseStrength * (playerPosi.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
-      } else if (quadr > 0) {
-        //Q2, Q4
-        impulse.y += (impulseStrength * (playerPosi.y < 0 ? -1 : 1)) / xFactor;
-      }
+    if (jump) {
+      console.log("jump");
+      impulse.y += 10 * impulseStrength * playerPosi.y;
+      impulse.z += 10 * impulseStrength * playerPosi.z;
     }
 
-    if (playerPosi.x < xBounds && rightward) {
-      impulse.x += impulseStrength;
-    }
-    if (playerPosi.x > -xBounds && leftward) {
-      impulse.x -= impulseStrength;
-    }
+    // anchor.current.applyImpulse(impulse);
 
-    if (backward) {
-      if (playerPosi.z > -zBounds && playerPosi.z < zBounds) {
-        impulse.z -= impulseStrength * tmp.y; //tmp.y negative
-      } else if (playerPosi.y > -yBounds && playerPosi.y < yBounds) {
-        impulse.y -= impulseStrength * -tmp.z;
-      } else if (quadr <= 0) {
-        //Q1, Q3
-        impulse.y -=
-          (-impulseStrength * (playerPosi.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
-      } else if (quadr > 0) {
-        //Q2, Q4
-        impulse.z += (impulseStrength * (playerPosi.y < 0 ? -1 : 1)) / xFactor;
-      }
-    }
+    // if (forward) {
+    //   // First two cases account for cases where we are at either of the 4 poles ([0,x], [0, -x], [0,y], [0,-y])
+    //   // For movement on a sphere, forward movement from impulse depends where we are
+    //   if (playerPosi.z > -zBounds && playerPosi.z < zBounds) {
+    //     impulse.z += impulseStrength * tmp.y;
+    //   } else if (playerPosi.y > -yBounds && playerPosi.y < yBounds) {
+    //     impulse.y += impulseStrength * -tmp.z;
+    //   } else if (quadr <= 0) {
+    //     //Q1, Q3
+    //     impulse.z +=
+    //       (-impulseStrength * (playerPosi.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
+    //   } else if (quadr > 0) {
+    //     //Q2, Q4
+    //     impulse.y += (impulseStrength * (playerPosi.y < 0 ? -1 : 1)) / xFactor;
+    //   }
+    // }
+
+    // if (playerPosi.x < xBounds && rightward) {
+    //   impulse.x += impulseStrength;
+    // }
+    // if (playerPosi.x > -xBounds && leftward) {
+    //   impulse.x -= impulseStrength;
+    // }
+
+    // if (backward) {
+    //   if (playerPosi.z > -zBounds && playerPosi.z < zBounds) {
+    //     impulse.z -= impulseStrength * tmp.y; //tmp.y negative
+    //   } else if (playerPosi.y > -yBounds && playerPosi.y < yBounds) {
+    //     impulse.y -= impulseStrength * -tmp.z;
+    //   } else if (quadr <= 0) {
+    //     //Q1, Q3
+    //     impulse.y -=
+    //       (-impulseStrength * (playerPosi.y <= 0 ? -1 : 1)) / xFactor; //ternary oprs flip movement if lower y space
+    //   } else if (quadr > 0) {
+    //     //Q2, Q4
+    //     impulse.z += (impulseStrength * (playerPosi.y < 0 ? -1 : 1)) / xFactor;
+    //   }
+    // }
 
     //player.current.applyImpulse(impulse);
 
@@ -124,13 +143,24 @@ export default function Player({ idle, setIdle }) {
   return (
     <>
       <OrbitControls />
+      {/* <RigidBody
+        collisionGroups={interactionGroups(2, 1)}
+        type="dynamic"
+        colliders="cuboid"
+        ref={anchor}
+      >
+        <mesh>
+          <boxGeometry args={[0.1, 0.1, 0.1]} />
+          <meshStandardMaterial color="red" />
+        </mesh>
+      </RigidBody> */}
       <RigidBody
         collisionGroups={interactionGroups(2, 1)}
         mass={1}
         ref={player}
         type="fixed"
         colliders="hull"
-        position={[0, 0.8, 0.7]} //0, 0.7, 0.8
+        position={[0, 0.8, 0.7]} //0, 0.8, 0.7
         rotation={[Math.PI * -0.3, 0, 0]}
         enabledRotations={[false, false, false, false]}
       >

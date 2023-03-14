@@ -17,6 +17,7 @@ export default function LoadingScreen({ started, onStarted }) {
           />
         </div>
         <div className="loadingScreen--board">
+          {progress == 100 ? <div className="header">in development</div> : ""}
           <h1 className="loadingScreen--title">welcome to smaalworld!</h1>
           <button
             className="loadingScreen--button"

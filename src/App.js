@@ -11,7 +11,7 @@ import Messages from "./Messages.js";
 import Nightmode from "./Nightmode.js";
 
 export default function App() {
-  const [start, setStart] = useState(true);
+  const [start, setStart] = useState(false);
   const [msg, setMsg] = useState("");
   const [desc, setDesc] = useState("");
   const [nightMode, setMode] = useState(true);

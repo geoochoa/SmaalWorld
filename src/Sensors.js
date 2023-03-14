@@ -16,8 +16,8 @@ export default function Sensors({ setMsg, setDesc }) {
           setDesc(`${sensorDesc}`);
         }}
         onIntersectionExit={() => {
-          setMsg("");
-          setDesc("");
+          setMsg("This world is in development");
+          setDesc("Lots of changes to come!");
         }}
       />
     );

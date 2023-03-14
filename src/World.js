@@ -77,7 +77,6 @@ export default function World({ setMsg, setDesc }) {
           <meshBasicMaterial map={bakedTexture} />
         </mesh>
         {lights.map((light) => {
-          console.log(light);
           return (
             <mesh
               key={light}
