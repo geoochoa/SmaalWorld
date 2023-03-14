@@ -28,7 +28,7 @@ export default function Sensors({ setMsg, setDesc }) {
       <CubeSensor
         position={[0.7, 0.8, 0]}
         rotation={-0.2}
-        sensorMsg="I'm Geo, and this is my little world!"
+        sensorMsg="I'm Geo and this is my little world!"
         sensorDesc="Use the keyboard to explore"
       />
     </>

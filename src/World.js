@@ -5,6 +5,7 @@ import { useRef } from "react";
 import { useGLTF, useKeyboardControls, useTexture } from "@react-three/drei";
 import Colliders from "./Colliders.js";
 import Sensors from "./Sensors.js";
+import { useState } from "react";
 
 export default function World({ setMsg, setDesc }) {
   /*
@@ -13,6 +14,12 @@ export default function World({ setMsg, setDesc }) {
   const { nodes } = useGLTF("./models/world2.glb");
   const bakedTexture = useTexture("./models/baked2.jpg");
   bakedTexture.flipY = false;
+
+  var lights = [];
+  for (const node in nodes) {
+    if (node == "baked" || node == "Scene") continue;
+    lights.push(nodes[node].name);
+  }
 
   /**
    * Controls
@@ -69,6 +76,20 @@ export default function World({ setMsg, setDesc }) {
         <mesh geometry={nodes.baked.geometry}>
           <meshBasicMaterial map={bakedTexture} />
         </mesh>
+        {lights.map((light) => {
+          console.log(light);
+          return (
+            <mesh
+              key={light}
+              geometry={nodes[light].geometry}
+              position={nodes[light].position}
+              rotation={nodes[light].rotation}
+              scale={nodes[light].scale}
+            >
+              <meshBasicMaterial color="#ffffe5" />
+            </mesh>
+          );
+        })}
       </RigidBody>
     </>
   );

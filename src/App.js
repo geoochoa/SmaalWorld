@@ -8,11 +8,13 @@ import Experience from "./Experience.js";
 import LoadingScreen from "./LoadingScreen.js";
 import Interface from "./Interface.js";
 import Messages from "./Messages.js";
+import Nightmode from "./Nightmode.js";
 
 export default function App() {
-  const [start, setStart] = useState(false);
+  const [start, setStart] = useState(true);
   const [msg, setMsg] = useState("");
   const [desc, setDesc] = useState("");
+  const [nightMode, setMode] = useState(true);
 
   return (
     <>
@@ -26,6 +28,7 @@ export default function App() {
         ]}
       >
         <Canvas
+          flat
           shadows
           camera={{
             fov: 28,
@@ -38,10 +41,12 @@ export default function App() {
             <Experience
               setMsg={(msg) => setMsg(msg)}
               setDesc={(desc) => setDesc(desc)}
+              nightMode={nightMode}
             />
           </Suspense>
         </Canvas>
         <Interface />
+        <Nightmode mode={nightMode} switchMode={() => setMode(!nightMode)} />
         {msg == "" ? false : true && <Messages currMsg={msg} currDesc={desc} />}
         <LoadingScreen started={start} onStarted={() => setStart(true)} />
       </KeyboardControls>
