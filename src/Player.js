@@ -9,7 +9,7 @@ import { useFrame } from "@react-three/fiber";
 import { useRef, useState, useEffect, Children } from "react";
 import { useKeyboardControls, OrbitControls } from "@react-three/drei";
 
-export default function Player({ idle, setIdle }) {
+export default function Player({ idle, setIdle, autoFwd }) {
   const player = useRef();
   // const anchor = useRef();
   const [subscribeKeys, getKeys] = useKeyboardControls();
@@ -101,10 +101,10 @@ export default function Player({ idle, setIdle }) {
     /**
      * Camera
      */
-    if (forward || backward || leftward || rightward || jump) {
+
+    if (idle && (autoFwd || forward || backward || leftward || rightward)) {
       setIdle(false);
     }
-
     const cameraPosi = new THREE.Vector3();
     cameraPosi.copy(playerPosi);
 
@@ -143,17 +143,7 @@ export default function Player({ idle, setIdle }) {
   return (
     <>
       <OrbitControls />
-      {/* <RigidBody
-        collisionGroups={interactionGroups(2, 1)}
-        type="dynamic"
-        colliders="cuboid"
-        ref={anchor}
-      >
-        <mesh>
-          <boxGeometry args={[0.1, 0.1, 0.1]} />
-          <meshStandardMaterial color="red" />
-        </mesh>
-      </RigidBody> */}
+
       <RigidBody
         collisionGroups={interactionGroups(2, 1)}
         mass={1}

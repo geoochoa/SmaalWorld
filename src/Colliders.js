@@ -5,6 +5,13 @@ import {
   CylinderCollider,
 } from "@react-three/rapier";
 
+/**
+ * Interaction Groups
+ *  Group 1: House, Trees, etc
+ *  Group 2: Player (collides with Group 1)
+ *  Group 5: World (Isolated, used as walking floor)
+ */
+
 export default function Colliders() {
   const CubeCollider = (transform) => {
     const { id, scale, args, position, rotation } = transform;
@@ -16,7 +23,6 @@ export default function Colliders() {
         args={args}
         position={position}
         rotation={[0, 0, Math.PI * rotation]}
-        onContactForce={() => console.log("Collision:", id)}
       />
     );
   };
@@ -28,16 +34,16 @@ export default function Colliders() {
   };
 
   const CylCollider = (transform) => {
-    const { id, scale, args, position, rotation } = transform;
+    const { id, scale, args, position, rotation, intGroupX, intGroupY } =
+      transform;
     return (
       <CylinderCollider
         mass={0}
-        collisionGroups={interactionGroups(1, 2)}
+        collisionGroups={interactionGroups(intGroupX, intGroupY)}
         scale={scale}
         args={args}
         position={position}
         rotation={[0, 0, Math.PI * rotation]}
-        // onContactForce={() => console.log("Collision:", id)}
       />
     );
   };
@@ -46,6 +52,8 @@ export default function Colliders() {
     args: [0.05, 0.05, 0.05],
     scale: 0.2,
     rotation: 0,
+    intGroupX: 1,
+    intGroupY: 2,
   };
 
   return (
@@ -57,6 +65,7 @@ export default function Colliders() {
         args={[4.5, 2, 10]}
         position={[0, 0, 0]}
         rotation={[Math.PI * -0.5, 0, 0]}
+        intGroupX={5}
       />
       {/* House */}
       <CubeCollider

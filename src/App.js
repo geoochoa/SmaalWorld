@@ -9,12 +9,15 @@ import LoadingScreen from "./LoadingScreen.js";
 import Interface from "./Interface.js";
 import Messages from "./Messages.js";
 import Nightmode from "./Nightmode.js";
+import NavBar from "./NavBar.js";
 
 export default function App() {
-  const [start, setStart] = useState(false);
+  const [start, setStart] = useState(true);
   const [msg, setMsg] = useState("");
   const [desc, setDesc] = useState("");
+  const [link, setLink] = useState("");
   const [nightMode, setMode] = useState(true);
+  const [autoFwd, setAutoFwd] = useState(false);
 
   return (
     <>
@@ -37,17 +40,31 @@ export default function App() {
             position: [0, 0, 5],
           }}
         >
+          {/* <Perf /> */}
           <Suspense fallback={null}>
             <Experience
               setMsg={(msg) => setMsg(msg)}
               setDesc={(desc) => setDesc(desc)}
+              setLink={(link) => setLink(link)}
               nightMode={nightMode}
+              autoFwd={autoFwd}
+              setAutoFwd={() => setAutoFwd(false)}
             />
           </Suspense>
         </Canvas>
-        <Interface />
-        <Nightmode mode={nightMode} switchMode={() => setMode(!nightMode)} />
-        {msg == "" ? false : true && <Messages currMsg={msg} currDesc={desc} />}
+        <NavBar />
+        {/* <Interface /> */}
+        {/* <Nightmode mode={nightMode} switchMode={() => setMode(!nightMode)} /> */}
+        {msg == ""
+          ? false
+          : true && (
+              <Messages
+                currMsg={msg}
+                currDesc={desc}
+                currLink={link}
+                setAutoFwd={() => setAutoFwd(true)}
+              />
+            )}
         <LoadingScreen started={start} onStarted={() => setStart(true)} />
       </KeyboardControls>
     </>

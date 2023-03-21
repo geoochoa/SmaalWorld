@@ -7,7 +7,14 @@ import Colliders from "./Colliders.js";
 import Sensors from "./Sensors.js";
 import { useState } from "react";
 
-export default function World({ setMsg, setDesc }) {
+export default function World({
+  setMsg,
+  setDesc,
+  setLink,
+  autoFwd,
+  setAutoFwd,
+  idle,
+}) {
   /*
    * Models, Textures
    */
@@ -39,13 +46,17 @@ export default function World({ setMsg, setDesc }) {
     const impulseStrength = 35 * delta;
     const torqueStrength = 20 * delta;
 
+    if (autoFwd && (forward || backward || leftward || rightward)) {
+      setAutoFwd(false);
+    }
+    if (autoFwd || forward) {
+      torque.x += torqueStrength;
+    }
+
     if (backward) {
       torque.x -= torqueStrength;
     }
 
-    if (forward) {
-      torque.x += torqueStrength;
-    }
     if (worldPosition.x > -xBounds && rightward) {
       impulse.x -= impulseStrength;
     }
@@ -61,7 +72,7 @@ export default function World({ setMsg, setDesc }) {
   return (
     <>
       <RigidBody
-        collisionGroups={interactionGroups(0, 1)}
+        // collisionGroups={interactionGroups(0, 1)}
         ref={body}
         type="dynamic"
         colliders={false}
@@ -72,7 +83,13 @@ export default function World({ setMsg, setDesc }) {
         rotation={[0, -Math.PI * 0.5, 0]}
       >
         <Colliders />
-        <Sensors setMsg={setMsg} setDesc={setDesc} />
+        <Sensors
+          setMsg={setMsg}
+          setDesc={setDesc}
+          setLink={setLink}
+          setAutoFwd={setAutoFwd}
+          idle={idle}
+        />
         <mesh geometry={nodes.baked.geometry}>
           <meshBasicMaterial map={bakedTexture} />
         </mesh>
