@@ -12,7 +12,7 @@ import Nightmode from "./Nightmode.js";
 import NavBar from "./NavBar.js";
 
 export default function App() {
-  const [start, setStart] = useState(true);
+  const [start, setStart] = useState(false);
   const [msg, setMsg] = useState("");
   const [desc, setDesc] = useState("");
   const [link, setLink] = useState("");
