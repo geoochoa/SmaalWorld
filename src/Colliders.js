@@ -4,6 +4,7 @@ import {
   CuboidCollider,
   CylinderCollider,
 } from "@react-three/rapier";
+import React from "react";
 
 /**
  * Interaction Groups
@@ -12,7 +13,7 @@ import {
  *  Group 5: World (Isolated, used as walking floor)
  */
 
-export default function Colliders() {
+function Colliders() {
   const CubeCollider = (transform) => {
     const { id, scale, args, position, rotation } = transform;
     return (
@@ -58,6 +59,7 @@ export default function Colliders() {
 
   return (
     <>
+      {/* {console.log("colliders render...")} */}
       {/* World */}
       <CylinderCollider
         id="world"
@@ -129,3 +131,7 @@ export default function Colliders() {
     </>
   );
 }
+
+const MemoizedColliders = React.memo(Colliders);
+
+export default MemoizedColliders;

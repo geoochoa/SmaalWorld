@@ -5,16 +5,42 @@ import { useRef } from "react";
 import { useGLTF, useKeyboardControls, useTexture } from "@react-three/drei";
 import Colliders from "./Colliders.js";
 import Sensors from "./Sensors.js";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import Messages from "./Messages.js";
 
-export default function World({
-  setMsg,
-  setDesc,
-  setLink,
-  autoFwd,
-  setAutoFwd,
-  idle,
-}) {
+export default function World() {
+  /**
+   * Msg State
+   */
+  {
+    /* "Welcome, feel free to explore!",
+      //  "Use the arrow/wasd keys or",
+      //   "try presentation mode" */
+  }
+  const [titl, setTitl] = useState("Welcome, feel free to explore!");
+  const [desc, setDesc] = useState(
+    "Use the arrow/wasd keys or try presentation mode"
+  );
+  const [link, setLink] = useState("");
+
+  const setMsg = useCallback((titl, desc, link) => {
+    setTitl(titl);
+    setDesc(desc);
+    setLink(link);
+  }, []);
+
+  /**
+   *  Auto
+   */
+  const [autoFwd, setAutoFwd] = useState(false);
+  const setAuto = useCallback((val) => {
+    setAutoFwd(val);
+  }, []);
+
+  const getAuto = useCallback(() => {
+    return autoFwd;
+  }, [autoFwd]);
+
   /*
    * Models, Textures
    */
@@ -47,8 +73,9 @@ export default function World({
     const torqueStrength = 20 * delta;
 
     if (autoFwd && (forward || backward || leftward || rightward)) {
-      setAutoFwd(false);
+      setAuto(false);
     }
+
     if (autoFwd || forward) {
       torque.x += torqueStrength;
     }
@@ -71,8 +98,8 @@ export default function World({
 
   return (
     <>
+      <Messages titl={titl} desc={desc} link={link} setAuto={setAuto} />
       <RigidBody
-        // collisionGroups={interactionGroups(0, 1)}
         ref={body}
         type="dynamic"
         colliders={false}
@@ -80,16 +107,11 @@ export default function World({
         linearDamping={5}
         enabledRotations={[true, false, false, false]}
         enabledTranslations={[true, false, false, false]}
-        rotation={[0, -Math.PI * 0.5, 0]}
+        rotation={[-0.2, -Math.PI * 0.5, 0]} //-0.2
       >
         <Colliders />
-        <Sensors
-          setMsg={setMsg}
-          setDesc={setDesc}
-          setLink={setLink}
-          setAutoFwd={setAutoFwd}
-          idle={idle}
-        />
+        <Sensors setMsg={setMsg} setAuto={setAuto} getAuto={getAuto} />
+
         <mesh geometry={nodes.baked.geometry}>
           <meshBasicMaterial map={bakedTexture} />
         </mesh>

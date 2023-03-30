@@ -1,23 +1,15 @@
 import "./style.css";
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useCallback, useMemo } from "react";
 import { Perf } from "r3f-perf";
 import { Debug } from "@react-three/rapier";
 import { KeyboardControls } from "@react-three/drei";
 import Experience from "./Experience.js";
 import LoadingScreen from "./LoadingScreen.js";
-import Interface from "./Interface.js";
-import Messages from "./Messages.js";
-import Nightmode from "./Nightmode.js";
 import NavBar from "./NavBar.js";
 
 export default function App() {
-  const [start, setStart] = useState(false);
-  const [msg, setMsg] = useState("");
-  const [desc, setDesc] = useState("");
-  const [link, setLink] = useState("");
-  const [nightMode, setMode] = useState(true);
-  const [autoFwd, setAutoFwd] = useState(false);
+  const [start, setStart] = useState(true);
 
   return (
     <>
@@ -42,29 +34,10 @@ export default function App() {
         >
           {/* <Perf /> */}
           <Suspense fallback={null}>
-            <Experience
-              setMsg={(msg) => setMsg(msg)}
-              setDesc={(desc) => setDesc(desc)}
-              setLink={(link) => setLink(link)}
-              nightMode={nightMode}
-              autoFwd={autoFwd}
-              setAutoFwd={() => setAutoFwd(false)}
-            />
+            <Experience />
           </Suspense>
         </Canvas>
         <NavBar />
-        {/* <Interface /> */}
-        {/* <Nightmode mode={nightMode} switchMode={() => setMode(!nightMode)} /> */}
-        {msg == ""
-          ? false
-          : true && (
-              <Messages
-                currMsg={msg}
-                currDesc={desc}
-                currLink={link}
-                setAutoFwd={() => setAutoFwd(true)}
-              />
-            )}
         <LoadingScreen started={start} onStarted={() => setStart(true)} />
       </KeyboardControls>
     </>
