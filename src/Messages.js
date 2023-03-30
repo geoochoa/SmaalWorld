@@ -40,6 +40,8 @@ function Messages({ titl, desc, link, setAuto }) {
       <>
         {/* {console.log("message render...")} */}
         <Text
+          scale={0.8}
+          font="./fonts/Poppins-Regular.ttf"
           color="white"
           textAlign={"left"}
           anchorX="left"
@@ -68,7 +70,7 @@ function Messages({ titl, desc, link, setAuto }) {
     content: "",
     delay: 35,
     wait: 0,
-    position: [-0.97, 0.49, 1],
+    position: [-0.78, 0.4, 1.5], //{[-0.78, 0.34, 1.5]}
     fontSize: 0.05,
     outlineWidth: 0,
     indent: 0,
@@ -80,7 +82,7 @@ function Messages({ titl, desc, link, setAuto }) {
       <AnimText
         id="desc"
         content={desc}
-        position={[-0.97, 0.42, 1]}
+        position={[-0.78, 0.35, 1.5]}
         fontSize={0.04}
         wait={titl.length}
       />
@@ -88,11 +90,11 @@ function Messages({ titl, desc, link, setAuto }) {
         <AnimText
           id="link"
           content={link}
-          position={[-0.97, 0.42, 1]}
+          position={[-0.78, 0.35, 1.5]}
           fontSize={0.04}
           delay={0}
           wait={titl.length + desc.length}
-          indent={0.0175 * desc.length}
+          indent={0.0195 * desc.length}
         />
       )}
     </>
