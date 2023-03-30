@@ -14,7 +14,7 @@ export default function Experience() {
   return (
     <>
       <Physics gravity={[0, -0.1, 0]}>
-        <Debug />
+        {/* <Debug /> */}
         <Lights />
         <Stars radius={30} factor={3} depth={50} fade speed={0.1} />
         <World />

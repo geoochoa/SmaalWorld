@@ -40,7 +40,6 @@ function Messages({ titl, desc, link, setAuto }) {
       <>
         {/* {console.log("message render...")} */}
         <Text
-          // font="public/fonts/Poppins-Regular.ttf"
           color="white"
           textAlign={"left"}
           anchorX="left"
