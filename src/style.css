@@ -266,7 +266,8 @@ body,
 
 .loadingScreen--button:hover {
   /*  rgba(0, 0, 0, 0.42); */
-  color: rgb(107,184,52);
+  /* color: rgb(107,184,52); */
+  color: rgb(241, 154, 62);
   background-color: rgba(0, 0, 0, 0.42);
   cursor: pointer;
 }

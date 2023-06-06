@@ -1,5 +1,4 @@
 import { interactionGroups, CuboidCollider } from "@react-three/rapier";
-import { useState } from "react";
 import React from "react";
 
 /**
@@ -9,7 +8,7 @@ import React from "react";
  *  Group 5: World (Isolated, used as walking floor)
  */
 
-function Sensors({ setMsg, getAuto, setAuto }) {
+function Sensors({ target, setTarget, setSection, setMsg, setAuto, getAuto }) {
   /**
    * Welcome Message
    */
@@ -20,14 +19,19 @@ function Sensors({ setMsg, getAuto, setAuto }) {
 
     function handleIntersection() {
       setMsg(sensorTitl, sensorDesc, sensorLink);
+      setSection(id);
       // if (!idle) {
       // if (currMsg[0] != sensorTitl) {
       // setMsgg(sensorTitl, sensorDesc, sensorLink);
       // }
-      if (getAuto() != false) {
+
+      if ((target == "" || target == id) && getAuto() != false) {
         setTimeout(function () {
           setAuto(false);
         }, 100); //ms
+        if (target != "") {
+          setTarget("");
+        }
       }
     }
 
@@ -49,35 +53,33 @@ function Sensors({ setMsg, getAuto, setAuto }) {
 
   return (
     <>
-      {/* {This rerenders every content change. This is bad as I shouldn't be rerendering sensors} */}
-      {/* {console.log("sensors render...")} */}
       <CubeSensor
-        id="intro"
+        id="Home"
         position={[0.7, 0.8, 0]}
         rotation={-0.2}
-        sensorTitl="I'm Geo, a full stack software developer"
+        sensorTitl="I'm Geo, a full stack software engineer"
         sensorDesc="This is but a small introduction into who I am!"
       />
       <CubeSensor
-        id="projects"
+        id="Work"
         position={[-0.7, 0.8, 0]}
         rotation={0.2}
-        sensorTitl="This is where projects will live"
-        sensorDesc="Click to see info!"
+        sensorTitl="These are some projects I've worked on"
+        sensorDesc="Check out my github for more information!"
       />
       <CubeSensor
-        id="skills"
+        id="Skills"
         position={[-0.7, -0.8, 0]}
         rotation={-0.2}
-        sensorTitl="This is where skills will live"
-        sensorDesc="Click to see info!"
+        sensorTitl="This is what I'm typically developing with"
+        sensorDesc="I'm always trying to learn new technologies!"
       />
       <CubeSensor
-        id="contact"
+        id="Contact"
         position={[0.7, -0.8, 0]}
         rotation={0.2}
-        sensorTitl="This is where contact will live"
-        sensorDesc="Click to see info!"
+        sensorTitl="You can find more of me here"
+        sensorDesc="Feel free to reach out, I enjoy conversations!"
       />
     </>
   );

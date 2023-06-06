@@ -7,6 +7,7 @@ import Colliders from "./Colliders.js";
 import Sensors from "./Sensors.js";
 import { useState, useCallback } from "react";
 import Messages from "./Messages.js";
+import NavBar from "./NavBar.js";
 
 export default function World() {
   /**
@@ -18,10 +19,10 @@ export default function World() {
       //   "try presentation mode" */
   }
   const [titl, setTitl] = useState("Welcome, feel free to explore!");
-  const [desc, setDesc] = useState(
-    "Use the arrow/wasd keys or try presentation mode"
-  );
-  const [link, setLink] = useState("");
+  const [desc, setDesc] = useState("Use the arrow keys or try ");
+  const [link, setLink] = useState("presentation mode");
+
+  const [nav, setNav] = useState(true);
 
   const setMsg = useCallback((titl, desc, link) => {
     setTitl(titl);
@@ -32,6 +33,8 @@ export default function World() {
   /**
    *  Auto
    */
+  const [section, setSection] = useState("");
+  const [target, setTarget] = useState("");
   const [autoFwd, setAutoFwd] = useState(false);
   const setAuto = useCallback((val) => {
     setAutoFwd(val);
@@ -65,6 +68,14 @@ export default function World() {
     const worldPosition = body.current.translation();
     const { forward, backward, leftward, rightward } = getKeys();
     const xBounds = 2;
+    const xPos = worldPosition.x.toFixed(2);
+
+    if (!nav && xPos > -0.34 && xPos < 0.34) {
+      setNav(true);
+    }
+    if (nav && (xPos > 0.34 || xPos < -0.34)) {
+      setNav(false);
+    }
 
     const impulse = { x: 0, y: 0, z: 0 };
     const torque = { x: 0, y: 0, z: 0 };
@@ -98,6 +109,9 @@ export default function World() {
 
   return (
     <>
+      {nav && (
+        <NavBar section={section} setTarget={setTarget} setAuto={setAuto} />
+      )}
       <Messages titl={titl} desc={desc} link={link} setAuto={setAuto} />
       <RigidBody
         ref={body}
@@ -110,7 +124,14 @@ export default function World() {
         rotation={[-0.2, -Math.PI * 0.5, 0]} //-0.2
       >
         <Colliders />
-        <Sensors setMsg={setMsg} setAuto={setAuto} getAuto={getAuto} />
+        <Sensors
+          target={target}
+          setTarget={setTarget}
+          setSection={setSection}
+          setMsg={setMsg}
+          setAuto={setAuto}
+          getAuto={getAuto}
+        />
 
         <mesh geometry={nodes.baked.geometry}>
           <meshBasicMaterial map={bakedTexture} />

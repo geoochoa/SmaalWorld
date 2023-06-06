@@ -37,7 +37,6 @@ export default function App() {
             <Experience />
           </Suspense>
         </Canvas>
-        <NavBar />
         <LoadingScreen started={start} onStarted={() => setStart(true)} />
       </KeyboardControls>
     </>

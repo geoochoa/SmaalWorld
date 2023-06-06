@@ -7,7 +7,7 @@ import {
 import { useControls } from "leva";
 import { useFrame } from "@react-three/fiber";
 import { useRef, useState, useEffect, Children } from "react";
-import { useKeyboardControls, OrbitControls } from "@react-three/drei";
+import { useKeyboardControls, OrbitControls, useGLTF } from "@react-three/drei";
 
 export default function Player({ autoFwd }) {
   const player = useRef();
@@ -144,14 +144,15 @@ export default function Player({ autoFwd }) {
     <>
       {/* <OrbitControls /> */}
 
+      {/* <P5 /> */}
       <RigidBody
         collisionGroups={interactionGroups(2, 1)}
         mass={1}
         ref={player}
         type="fixed"
         colliders="hull"
-        position={[0, 0.8, 0.7]} //0, 0.8, 0.7
-        rotation={[Math.PI * -0.3, 0, 0]}
+        position={[0, 0.82, 0.71]} //0, 0.8, 0.7
+        rotation={[Math.PI * 0.3, 0, 0]}
         enabledRotations={[false, false, false, false]}
       >
         <mesh castShadow scale={0.4}>
