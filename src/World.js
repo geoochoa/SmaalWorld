@@ -8,6 +8,7 @@ import Sensors from "./Sensors.js";
 import { useState, useCallback } from "react";
 import Messages from "./Messages.js";
 import NavBar from "./NavBar.js";
+import Images from "./Images.js";
 
 export default function World() {
   /**
@@ -123,6 +124,7 @@ export default function World() {
         enabledTranslations={[true, false, false, false]}
         rotation={[-0.2, -Math.PI * 0.5, 0]} //-0.2
       >
+        <Images />
         <Colliders />
         <Sensors
           target={target}

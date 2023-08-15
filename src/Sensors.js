@@ -39,7 +39,7 @@ function Sensors({ target, setTarget, setSection, setMsg, setAuto, getAuto }) {
       <CuboidCollider
         mass={0}
         sensor
-        args={[0.005, 0.01, 0.5]} //0.3, 0.01, 2.3
+        args={[0.005, 0.01, 2.5]} //0.3, 0.01, 2.3, //0.005, 0.01, 0.5 only middle
         collisionGroups={interactionGroups(1)}
         position={position}
         rotation={[0, 0, Math.PI * rotation]}

@@ -6,12 +6,14 @@ import Player from "./Player.js";
 import { useState, useCallback } from "react";
 import { Debug } from "@react-three/rapier";
 import { Sky, Stars } from "@react-three/drei";
+import { OrbitControls } from "@react-three/drei";
 
 export default function Experience() {
   // const [idle, setIdle] = useState(true);
 
   return (
     <>
+      {/* <OrbitControls /> */}
       <Physics gravity={[0, -0.1, 0]}>
         {/* <Debug /> */}
         <Lights />
